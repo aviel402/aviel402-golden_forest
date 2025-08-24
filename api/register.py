@@ -13,7 +13,7 @@ def get_db_connection():
 @app.route('/api/register', methods=['POST'])
 def register_player():
     """
-    זו הפונקציה שתטפל בהרשמה של שחקן חדש.
+    זו הפקציה שתטפל בהרשמה של שחקן חדש.
     היא מצפה לקבל מייל וסיסמה.
     """
     try:
