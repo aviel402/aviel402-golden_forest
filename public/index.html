@@ -1,47 +1,12 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>יער הזהב</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background-color: white; padding: 20px 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; width: 320px; }
-        h1 { font-size: 24px; margin-bottom: 20px; }
-        input, button { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; }
-        button { background-color: #1877f2; color: white; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
-        button.secondary { background-color: #42b72a; }
-        p#message { margin-top: 15px; font-weight: bold; font-size: 14px; min-height: 20px; }
-        .toggle-link { color: #1877f2; cursor: pointer; margin-top: 15px; display: block; font-size: 14px; text-decoration: none; }
-        .hidden { display: none; }
-    </style>
+    <title>בדיקת לחיצה</title>
 </head>
 <body>
-    <div class="container">
-        <!-- טופס כניסה (מוצג ראשון) -->
-        <div id="loginView">
-            <h1>כניסה למשחק</h1>
-            <form id="loginForm">
-                <input type="email" id="loginEmail" placeholder="אימייל" required>
-                <input type="password" id="loginPassword" placeholder="סיסמה" required>
-                <button type="submit">היכנס ליער</button>
-            </form>
-            <a href="#" class="toggle-link" id="showRegister">אין לך שחקן? הירשם כאן</a>
-        </div>
-
-        <!-- טופס הרשמה (מוסתר בהתחלה) -->
-        <div id="registerView" class="hidden">
-            <h1>יצירת שחקן חדש</h1>
-            <form id="registerForm">
-                <input type="email" id="registerEmail" placeholder="אימייל" required>
-                <input type="password" id="registerPassword" placeholder="סיסמה" required>
-                <button type="submit" class="secondary">צור שחקן</button>
-            </form>
-            <a href="#" class="toggle-link" id="showLogin">כבר יש לך שחקן? היכנס כאן</a>
-        </div>
-        
-        <p id="message"></p>
-    </div>
+    <h1>בדיקה הכי פשוטה</h1>
+    <button id="testButton">לחץ כאן לבדיקה</button>
+    <p id="message"></p>
     <script src="/script.js"></script>
 </body>
 </html>
