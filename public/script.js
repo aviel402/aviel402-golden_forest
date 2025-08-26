@@ -1,71 +1,51 @@
-// קובץ: public/script.js
-// גרסה פשוטה וישירה המבוססת על העיקרון שהכתובת היא הדבר היחיד שמשתנה.
+// קובץ: public/script.js - בדיקת לחיצה בלבד
+
+// הדבר הראשון שהסקריפט עושה זה להדפיס לקונסול כדי שנדע שהוא נטען
+console.log("!!! script.js loaded !!!");
 
 document.addEventListener('DOMContentLoaded', function() {
+    
+    // ברגע שהדף נטען, נדפיס הודעה נוספת
+    console.log("!!! DOMContentLoaded event fired !!!");
 
-    const loginView = document.getElementById('loginView');
-    const registerView = document.getElementById('registerView');
-    const showRegisterLink = document.getElementById('showRegister');
-    const showLoginLink = document.getElementById('showLogin');
+    const testButton = document.getElementById('testButton');
     const messageElement = document.getElementById('message');
-    
-    // מעבר למסך הרשמה
-    showRegisterLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        loginView.classList.add('hidden');
-        registerView.classList.remove('hidden');
-        messageElement.textContent = '';
-    });
-    
-    // מעבר למסך כניסה
-    showLoginLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        registerView.classList.add('hidden');
-        loginView.classList.remove('hidden');
-        messageElement.textContent = '';
-    });
-    
-    // =======================================================
-    //          העיקרון המרכזי בפעולה
-    // =======================================================
 
-    // טיפול בטופס ההרשמה
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
-        // קוראים לפונקציה הראשית עם הכתובת הנכונה
-        handleApiRequest('/api/register', { email, password }, 'יוצר שחקן חדש...');
-    });
-    
-    // טיפול בטופס הכניסה
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        // קוראים לאותה פונקציה ראשית, רק עם כתובת שונה
-        handleApiRequest('/api/login', { email, password }, 'מנסה להתחבר...');
-    });
-
-    // =======================================================
-    //    פונקציית עזר כללית - נשארה זהה כי היא בנויה נכון
-    // =======================================================
-    async function handleApiRequest(endpoint, bodyData, loadingMessage) {
-        messageElement.textContent = loadingMessage;
-        messageElement.style.color = 'inherit';
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bodyData)
-            });
-            const result = await response.json();
-            if (!response.ok) { throw new Error(result.error || 'שגיאה לא צפויה'); }
+    // בודקים אם הכפתור בכלל נמצא
+    if (testButton) {
+        console.log("Button 'testButton' was found!");
+        
+        // מוסיפים מאזין לאירוע הלחיצה
+        testButton.addEventListener('click', function() {
+            // אם הגענו לכאן - הצלחנו! המאזין עובד.
+            console.log("!!! BUTTON CLICKED !!!");
+            messageElement.textContent = "הצלחה! הלחיצה עבדה!";
             messageElement.style.color = 'green';
-            messageElement.textContent = result.message;
-        } catch (error) {
-            messageElement.style.color = 'red';
-            messageElement.textContent = `שגיאה: ${error.message}`;
-        }
+            alert('הכפתור נלחץ והגיב!'); // נוסיף alert כדי שנהיה בטוחים ב-100%
+        });
+        
+    } else {
+        // אם הכפתור לא נמצא, זו בעיה
+        console.error("Button 'testButton' was NOT found!");
+        messageElement.textContent = "שגיאה קריטית: הכפתור לא נמצא בדף.";
     }
 });
+```---
+### מה לעשות עכשיו (הבדיקה הקריטית)
+
+1.  ודא שרק שני הקבצים הפשוטים האלה (`index.html`, `script.js`) נמצאים בתיקיית `public`.
+2.  עשה `commit` ותן לפרויקט להיבנות מחדש.
+3.  **פתח את האתר שלך, פתח את כלי המפתחים (F12) ולחץ על לשונית ה-"Console"**.
+4.  רענן את הדף.
+5.  **לחץ על הכפתור "לחץ כאן לבדיקה"**.
+
+**מה אמור לקרות:**
+*   **בקונסול** - אתה אמור לראות את שלוש ההודעות: "script.js loaded", "DOMContentLoaded event fired", "BUTTON CLICKED!".
+*   **על המסך** - אתה אמור לראות את ההודעה "הצלחה! הלחיצה עבדה!".
+*   **הכי חשוב** - **יקפוץ לך `alert` (חלון קופץ) עם ההודעה "הכפתור נלחץ והגיב!".**
+
+**אנא, דווח לי מה התוצאה של הניסוי הזה.**
+*   **אם זה עובד** - אנחנו בדרך המלך! זה אומר שיש משהו בקוד ה-HTML המורכב שלנו ש"שבר" את הקישור ל-JavaScript. נוכל לחזור אליו ולתקן אותו בזהירות.
+*   **אם זה לא עובד** - זה אומר שהבעיה היא אפילו יותר בסיסית, ואולי קובץ ה-JavaScript שלנו בכלל לא נטען.
+
+אנחנו חייבים להגיע ליסוד הבעיה. אני מחכה לעדכון.
