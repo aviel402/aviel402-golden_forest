@@ -1,6 +1,6 @@
 # קובץ: api/index.py
 # מכיל את כל הלוגיקה של השרת
-
+from api.ai_logic import decide_monster_action
 from flask import Flask, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
@@ -103,3 +103,29 @@ def get_character_data():
         return jsonify(player_data), 200
     except Exception as e:
         return jsonify(error='שגיאת שרת בטעינת נתונים'), 500
+# הוסף את הקוד הזה בסוף api/index.py
+
+@app.route('/api/test-ai', methods=['POST'])
+def test_ai():
+    """
+    נקوڈת קצה לבדיקת ה-AI.
+    מקבלת את מצב השחקן והחיה, ומחזירה את החלטת ה-AI.
+    """
+    try:
+        # הנתונים האלה יגיעו בעתיד מהמשחק הגרפי
+        game_state = request.json
+        player_state = game_state.get('player')
+        monster_state = game_state.get('monster')
+
+        if not player_state or not monster_state:
+            return jsonify(error="נדרשים נתוני שחקן וחיה"), 400
+
+        # קוראים ל"מוח" של ה-AI כדי שיקבל החלטה
+        ai_decision = decide_monster_action(player_state, monster_state)
+        
+        # מחזירים את ההחלטה
+        return jsonify(ai_decision), 200
+
+    except Exception as e:
+        print(f"AI Test Error: {e}")
+        return jsonify(error="שגיאה בשרת ה-AI"), 500
