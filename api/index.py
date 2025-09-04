@@ -1,30 +1,21 @@
-# קובץ: api/index.py (גרסה 5.0 - יציבה ובדוקה)
+# קובץ: api/index.py (גרסה 6.0 - עם תיקון JSON וכל שאר התיקונים)
 
 from flask import Flask, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-import psycopg2
-import os
+import psycopg2, psycopg2.extras, os
 
 app = Flask(__name__)
 
 # פונקציית עזר לחיבור למסד הנתונים
-def get_db_connection():
-    # מדפיסים הודעה כדי לוודא שהפונקציה נקראת
-    print("Attempting to establish database connection...")
+def get_db():
     conn_url = os.environ.get("POSTGRES_URL")
-    if not conn_url:
-        print("FATAL ERROR: POSTGRES_URL environment variable not found!")
-        raise ValueError("Database connection URL is not configured.")
-    
-    conn = psycopg2.connect(conn_url)
-    print("Database connection successful.")
-    return conn
+    if not conn_url: raise Exception(" משתנה הסביבה POSTGRES_URL אינו מוגדר")
+    return psycopg2.connect(conn_url)
 
-# פונקציית אתחול שיוצרת את הטבלה
-def initialize_database():
+# יצירת הטבלה אם אינה קיימת, בפעם הראשונה שהשרת עולה
+with app.app_context():
     try:
-        print("Initializing database tables...")
-        conn = get_db_connection()
+        conn = get_db()
         cur = conn.cursor()
         cur.execute('''
             CREATE TABLE IF NOT EXISTS players (
@@ -33,69 +24,77 @@ def initialize_database():
                 password_hash TEXT NOT NULL
             );
         ''')
-        # בעתיד נוסיף כאן את שאר העמודות
         conn.commit()
-        cur.close()
-        conn.close()
-        print("Tables initialized successfully.")
     except Exception as e:
-        # אם יש תקלה ביצירת הטבלה, נראה אותה בלוגים
-        print(f"FATAL ERROR during DB initialization: {e}")
+        print(f"DB Init Warning: {e}")
+    finally:
+        if 'cur' in locals(): cur.close()
+        if 'conn' in locals(): conn.close()
 
-# מריצים את האתחול פעם אחת כשהשרת עולה
-with app.app_context():
-    initialize_database()
+# נקודת הקצה הראשית. תפקידה לאשר שהשרת חי.
+# חשוב שהיא תחזיר תשובה בפורמט JSON
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+     return jsonify(message="שרת 'יער הזהב' פעיל"), 200
 
 # ==================
 #    הרשמה (Register)
 # ==================
 @app.route('/api/register', methods=['POST'])
 def register():
-    print("\n--- Register endpoint hit ---")
-    conn = None
+    conn, cur = None, None
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify(error="לא התקבל מידע בבקשה"), 400
-        
-        email = data.get('email')
-        password = data.get('password')
+        data = request.get_json(silent=True)
+        if not data: return jsonify(error="בקשה לא תקינה"), 400
+        email, password = data.get('email'), data.get('password')
 
-        if not email or not password:
-            return jsonify(error='יש למלא אימייל וסיסמה'), 400
+        if not email or not password: return jsonify(error="נא למלא אימייל וסיסמה"), 400
             
-        print(f"Attempting to register user: {email}")
-
-        conn = get_db_connection()
+        conn = get_db()
         cur = conn.cursor()
         
         cur.execute("SELECT id FROM players WHERE email = %s", (email,))
-        if cur.fetchone():
-            return jsonify(error='שחקן עם אימייל זה כבר רשום'), 409
+        if cur.fetchone(): return jsonify(error="האימייל הזה כבר רשום במערכת"), 409
         
         password_hash = generate_password_hash(password)
-        cur.execute("INSERT INTO players (email, password_hash) VALUES (%s, %s) RETURNING id", (email, password_hash))
-        
+        cur.execute("INSERT INTO players (email, password_hash) VALUES (%s, %s)", (email, password_hash))
         conn.commit()
-        cur.close()
-        conn.close()
-        print(f"User {email} registered successfully.")
-        return jsonify(message='נרשמת בהצלחה!'), 201
+
+        return jsonify(message="נרשמת בהצלחה! כעת ניתן להתחבר."), 201
 
     except Exception as e:
-        print(f"!!! FATAL REGISTER ERROR: {e}")
-        return jsonify(error='אירעה שגיאת שרת פנימית בעת ההרשמה'), 500
+        print(f"Register Error: {e}")
+        return jsonify(error="אירעה שגיאת שרת פנימית בעת ההרשמה"), 500
     finally:
-        # נוודא שתמיד סוגרים את החיבור למסד הנתונים
-        if conn is not None:
-            conn.close()
+        if cur: cur.close()
+        if conn: conn.close()
 
 # ==================
 #     כניסה (Login)
 # ==================
-# פונקציית הלוגין נשארת כפי שהייתה, כי הבעיה הייתה בהרשמה
-
 @app.route('/api/login', methods=['POST'])
 def login():
-    # ... הקוד של לוגין נשאר כפי שהיה בתשובה המלאה הקודמת ...
-    pass
+    conn, cur = None, None
+    try:
+        data = request.get_json(silent=True)
+        if not data: return jsonify(error="בקשה לא תקינה"), 400
+        email, password = data.get('email'), data.get('password')
+
+        if not email or not password: return jsonify(error="נא למלא אימייל וסיסמה"), 400
+
+        conn = get_db()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT id, password_hash FROM players WHERE email = %s", (email,))
+        player = cur.fetchone()
+
+        if player and check_password_hash(player['password_hash'], password):
+            return jsonify(message="התחברת בהצלחה!", player_id=player['id']), 200
+        else:
+            return jsonify(error="האימייל או הסיסמה שגויים"), 401
+    except Exception as e:
+        print(f"Login Error: {e}")
+        return jsonify(error="אירעה שגיאת שרת פנימית בעת ההתחברות"), 500
+    finally:
+        if cur: cur.close()
+        if conn: conn.close()
