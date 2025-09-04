@@ -1,7 +1,31 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>יער הזהב - כניסה</title><link rel="stylesheet" href="/style.css"></head>
+<html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>יער הזהב</title><link rel="stylesheet" href="/style.css"></head>
 <body>
-    <div class="container"><div id="loginView"><h1>כניסה למשחק</h1><form id="loginForm"><input type="email" id="loginEmail" placeholder="אימייל" required><input type="password" id="loginPassword" placeholder="סיסמה" required><button type="submit">היכנס ליער</button></form><a href="#" class="toggle-link" id="showRegister">אין לך שחקן? הירשם כאן</a></div><div id="registerView" class="hidden"><h1>יצירת שחקן חדש</h1><form id="registerForm"><input type="email" id="registerEmail" placeholder="אימייל" required><input type="password" id="registerPassword" placeholder="סיסמה" required><button type="submit" class="secondary">צור שחקן</button></form><a href="#" class="toggle-link" id="showLogin">כבר רשום? היכנס כאן</a></div><p id="message"></p></div>
+    <div class="container">
+        <!-- טופס כניסה -->
+        <div id="loginView">
+            <h1>כניסה למשחק</h1>
+            <form id="loginForm">
+                <!-- שינוי: type="text" ו-placeholder לשם משתמש -->
+                <input type="text" id="loginUsername" placeholder="שם משתמש" required>
+                <input type="password" id="loginPassword" placeholder="סיסמה" required>
+                <button type="submit">היכנס ליער</button>
+            </form>
+            <a href="#" class="toggle-link" id="showRegister">אין לך שחקן? הירשם כאן</a>
+        </div>
+        <!-- טופס הרשמה -->
+        <div id="registerView" class="hidden">
+            <h1>יצירת שחקן חדש</h1>
+            <form id="registerForm">
+                <!-- שינוי: type="text" ו-placeholder לשם משתמש -->
+                <input type="text" id="registerUsername" placeholder="שם משתמש" required>
+                <input type="password" id="registerPassword" placeholder="סיסמה" required>
+                <button type="submit" class="secondary">צור שחקן</button>
+            </form>
+            <a href="#" class="toggle-link" id="showLogin">כבר רשום? היכנס כאן</a>
+        </div>
+        <p id="message"></p>
+    </div>
     <script src="/script.js"></script>
 </body>
 </html>
