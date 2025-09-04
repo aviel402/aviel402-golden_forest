@@ -1,94 +1,88 @@
-# קובץ: api/index.py (הגרסה השלמה והיציבה)
+# קובץ: api/index.py
+
 from flask import Flask, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-import psycopg2
-import psycopg2.extras 
+import json
 import os
 
 app = Flask(__name__)
 
-def get_db_connection():
-    conn_url = os.environ.get("POSTGRES_URL")
-    if not conn_url:
-        raise Exception("לא הוגדרה כתובת למסד הנתונים")
-    conn = psycopg2.connect(conn_url)
-    return conn
+# הנתיב לקובץ שבו נשמור את המידע. /tmp/ הוא המקום היחיד ש-Vercel מרשה לכתוב אליו.
+PLAYERS_DB_FILE = '/tmp/players_db.json'
 
-with app.app_context():
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS players (
-                id SERIAL PRIMARY KEY,
-                email TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
-                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, gold INTEGER DEFAULT 0
-            );
-        ''')
-        conn.commit()
-        cur.close()
-        conn.close()
-    except Exception as e:
-        print(f"DB Init Error: {e}")
+# פונקציית עזר לקריאת הקובץ
+def read_db():
+    if not os.path.exists(PLAYERS_DB_FILE):
+        return {}
+    with open(PLAYERS_DB_FILE, 'r') as f:
+        # try-except למקרה שהקובץ ריק או פגום
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return {}
 
+# פונקציית עזר לכתיבת הקובץ
+def write_db(data):
+    with open(PLAYERS_DB_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+
+# ==================
+#    הרשמה (Register)
+# ==================
 @app.route('/api/register', methods=['POST'])
-def register_player():
+def register():
     try:
         data = request.json
-        email, password = data.get('email'), data.get('password')
-        if not email or not password: return jsonify(error='מייל וסיסמה חובה'), 400
+        # שינוי: עובדים עם שם משתמש במקום אימייל
+        username = data.get('username')
+        password = data.get('password')
+
+        if not username or not password:
+            return jsonify(error='יש למלא שם משתמש וסיסמה'), 400
+
+        db = read_db()
+        if username in db:
+            return jsonify(error='שם המשתמש הזה כבר תפוס'), 409
         
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT id FROM players WHERE email = %s", (email,))
-        if cur.fetchone(): return jsonify(error='שחקן עם מייל זה כבר קיים'), 409
+        db[username] = {
+            'password_hash': generate_password_hash(password),
+            'level': 1,
+            'xp': 0,
+            'gold': 0
+        }
         
-        password_hash = generate_password_hash(password)
-        cur.execute("INSERT INTO players (email, password_hash) VALUES (%s, %s) RETURNING id", (email, password_hash))
-        player_id = cur.fetchone()[0]
-        conn.commit()
-        cur.close()
-        conn.close()
+        write_db(db)
         return jsonify(message='השחקן נוצר בהצלחה!'), 201
 
     except Exception as e:
-        return jsonify(error='שגיאת שרת בהרשמה'), 500
+        return jsonify(error=f"שגיאת שרת בהרשמה: {e}"), 500
 
+# ==================
+#     כניסה (Login)
+# ==================
 @app.route('/api/login', methods=['POST'])
-def login_player():
+def login():
     try:
         data = request.json
-        email, password = data.get('email'), data.get('password')
-        if not email or not password: return jsonify(error='מייל וסיסמה חובה'), 400
+        username = data.get('username')
+        password = data.get('password')
 
-        conn = get_db_connection()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) 
-        cur.execute("SELECT id, password_hash FROM players WHERE email = %s", (email,))
-        player = cur.fetchone()
-        cur.close()
-        conn.close()
-        
-        if player and check_password_hash(player['password_hash'], password):
-            return jsonify(message='התחברת בהצלחה!', player_id=player['id']), 200
+        if not username or not password:
+            return jsonify(error='יש למלא שם משתמש וסיסמה'), 400
+
+        db = read_db()
+        player_data = db.get(username)
+
+        if player_data and check_password_hash(player_data['password_hash'], password):
+            # מחזירים את כל הנתונים של השחקן, חוץ מהסיסמה המוצפנת
+            player_info_to_return = {
+                'username': username,
+                'level': player_data.get('level', 1),
+                'xp': player_data.get('xp', 0),
+                'gold': player_data.get('gold', 0)
+            }
+            return jsonify(message='התחברת בהצלחה!', player_data=player_info_to_return), 200
         else:
-            return jsonify(error='פרטי ההתחברות שגויים'), 401
+            return jsonify(error='שם המשתמש או הסיסמה שגויים'), 401
     except Exception as e:
-        return jsonify(error='שגיאת שרת בכניסה'), 500
-
-@app.route('/api/character-data', methods=['GET'])
-def get_character_data():
-    player_id = request.args.get('player_id')
-    if not player_id: return jsonify(error='נדרש מזהה שחקן'), 401
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("SELECT email, level, xp, gold FROM players WHERE id = %s", (player_id,))
-        player_data = cur.fetchone()
-        cur.close()
-        conn.close()
-        if not player_data: return jsonify(error='שחקן לא נמצא'), 404
-        return jsonify(player_data), 200
-    except Exception as e:
-        return jsonify(error='שגיאת שרת בטעינת נתונים'), 500
+        return jsonify(error=f"שגיאת שרת בכניסה: {e}"), 500
