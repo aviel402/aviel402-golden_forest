@@ -1,16 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const loginView = document.getElementById('loginView');
-    const registerView = document.getElementById('registerView');
-    const showRegister = document.getElementById('showRegister');
-    const showLogin = document.getElementById('showLogin');
+    // ... כל הגדרות האלמנטים נשארות זהות ...
+    const loginView = document.getElementById('loginView'), registerView = document.getElementById('registerView');
+    const showRegisterLink = document.getElementById('showRegister'), showLoginLink = document.getElementById('showLogin');
+
+    showRegisterLink.addEventListener('click', e => { e.preventDefault(); loginView.classList.add('hidden'); registerView.classList.remove('hidden'); });
+    showLoginLink.addEventListener('click', e => { e.preventDefault(); registerView.classList.add('hidden'); loginView.classList.remove('hidden'); });
+
+    // טיפול בטופס ההרשמה
+    document.getElementById('registerForm').addEventListener('submit', e => {
+        e.preventDefault();
+        // שינוי: קוראים את הערכים מהשדות הנכונים
+        const username = document.getElementById('registerUsername').value;
+        const password = document.getElementById('registerPassword').value;
+        // שינוי: שולחים username במקום email
+        handleApiRequest('/api/register', { username, password }, 'יוצר שחקן חדש...');
+    });
     
-    if (showRegister) showRegister.addEventListener('click', e => { e.preventDefault(); loginView.classList.add('hidden'); registerView.classList.remove('hidden'); });
-    if (showLogin) showLogin.addEventListener('click', e => { e.preventDefault(); registerView.classList.add('hidden'); loginView.classList.remove('hidden'); });
-    
-    if(document.getElementById('registerForm')) document.getElementById('registerForm').addEventListener('submit', e => { e.preventDefault(); handleApiRequest('/api/register', { email: document.getElementById('registerEmail').value, password: document.getElementById('registerPassword').value }, 'יוצר שחקן...'); });
-    if(document.getElementById('loginForm')) document.getElementById('loginForm').addEventListener('submit', e => { e.preventDefault(); handleApiRequest('/api/login', { email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value }, 'מתחבר...'); });
+    // טיפול בטופס הכניסה
+    document.getElementById('loginForm').addEventListener('submit', e => {
+        e.preventDefault();
+        // שינוי: קוראים את הערכים מהשדות הנכונים
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+        // שינוי: שולחים username במקום email
+        handleApiRequest('/api/login', { username, password }, 'מנסה להתחבר...');
+    });
 
     async function handleApiRequest(endpoint, bodyData, loadingMessage) {
+        // פונקציית העזר נשארת כמעט זהה
         const messageEl = document.getElementById('message');
         messageEl.textContent = loadingMessage; messageEl.style.color = 'inherit';
         try {
@@ -19,7 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(result.error || 'שגיאה לא צפויה');
             messageEl.style.color = 'green';
             messageEl.textContent = result.message;
-            if (endpoint === '/api/login' && result.player_id) { localStorage.setItem('player_id', result.player_id); setTimeout(() => { window.location.href = '/game.html'; }, 1000); }
-        } catch (error) { messageEl.style.color = 'red'; messageEl.textContent = `שגיאה: ${error.message}`; }
+            if (endpoint === '/api/login' && result.player_data) { 
+                localStorage.setItem('player_data', JSON.stringify(result.player_data)); 
+                setTimeout(() => { window.location.href = '/game.html'; }, 1000); 
+            }
+        } catch (error) {
+            messageEl.style.color = 'red';
+            messageEl.textContent = `שגיאה: ${error.message}`;
+        }
     }
 });
