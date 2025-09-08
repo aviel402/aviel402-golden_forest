@@ -1,41 +1,55 @@
-// קובץ: public/script.js - גרסת בדיקה פשוטה
-
-// הדבר הראשון שהקובץ עושה, כדי שנדע שהוא נטען
-console.log("בדיקה: קובץ script.js נטען.");
-
-// הקוד ימתין עד שכל ה-HTML יהיה מוכן
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // נודיע שהשלב הזה עבר בהצלחה
-    console.log("בדיקה: אירוע DOMContentLoaded הופעל. הדף מוכן.");
+const loginView = document.getElementById('loginView');
+const registerView = document.getElementById('registerView');
+const showRegisterLink = document.getElementById('showRegister');
+const showLoginLink = document.getElementById('showLogin');
+showRegisterLink.addEventListener('click', e => { e.preventDefault(); loginView.classList.add('hidden'); registerView.classList.remove('hidden'); });
+showLoginLink.addEventListener('click', e => { e.preventDefault(); registerView.classList.add('hidden'); loginView.classList.remove('hidden'); });
 
-    // נאתר את שני הכפתורים החשובים
-    const loginButton = document.querySelector('#loginForm button');
-    const registerButton = document.getElementById('showRegister');
-    
-    // --- בדיקה עבור כפתור הכניסה ---
-    if (loginButton) {
-        console.log("בדיקה: כפתור 'היכנס ליער' נמצא בהצלחה!");
-        
-        loginButton.addEventListener('click', (event) => {
-            event.preventDefault(); // מונעים מהטופס להישלח
-            console.log("!!! הצלחה: כפתור הכניסה נלחץ והגיב !!!");
-            alert('הצלחה! כפתור הכניסה עובד!');
-        });
-    } else {
-        console.error("!!! שגיאה: כפתור 'היכנס ליער' לא נמצא בדף !!!");
-    }
+document.getElementById('registerForm').addEventListener('submit', e => {
+    e.preventDefault();
+    handleApiRequest('/api/register', { 
+        username: document.getElementById('registerUsername').value, 
+        password: document.getElementById('registerPassword').value 
+    }, 'יוצר שחקן...');
+});
 
-    // --- בדיקה עבור קישור ההרשמה ---
-    if (registerButton) {
-        console.log("בדיקה: הקישור 'הירשם כאן' נמצא בהצלחה!");
-        
-        registerButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            console.log("!!! הצלחה: קישור ההרשמה נלחץ והגיב !!!");
-            alert('הצלחה! הקישור להרשמה עובד!');
+document.getElementById('loginForm').addEventListener('submit', e => {
+    e.preventDefault();
+    handleApiRequest('/api/login', { 
+        username: document.getElementById('loginUsername').value, 
+        password: document.getElementById('loginPassword').value 
+    }, 'מתחבר...');
+});
+
+async function handleApiRequest(endpoint, bodyData, loadingMessage) {
+    const messageEl = document.getElementById('message');
+    messageEl.textContent = loadingMessage;
+    messageEl.style.color = 'inherit';
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyData)
         });
-    } else {
-        console.error("!!! שגיאה: הקישור 'הירשם כאן' לא נמצא בדף !!!");
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'שגיאה לא צפויה');
+        
+        messageEl.style.color = 'green';
+        messageEl.textContent = result.message;
+        
+        // --- התיקון הקריטי כאן ---
+        // אנחנו בודקים אם השרת החזיר אובייקט 'player_data'
+        if (endpoint === '/api/login' && result.player_data) {
+            // שומרים את כל המידע על השחקן, לא רק את ה-ID
+            localStorage.setItem('player_data', JSON.stringify(result.player_data)); 
+            setTimeout(() => { 
+                window.location.href = '/game.html'; 
+            }, 1000); 
+        }
+    } catch (error) {
+        messageEl.style.color = 'red';
+        messageEl.textContent = `שגיאה: ${error.message}`;
     }
+}
 });
