@@ -1,92 +1,41 @@
-// קובץ: public/script.js
-// הגרסה היציבה והסופית של קוד הממשק
+// קובץ: public/script.js - גרסת בדיקה פשוטה
 
-// נוודא שהקוד ירוץ רק אחרי שכל הדף נטען במלואו
+// הדבר הראשון שהקובץ עושה, כדי שנדע שהוא נטען
+console.log("בדיקה: קובץ script.js נטען.");
+
+// הקוד ימתין עד שכל ה-HTML יהיה מוכן
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // נודיע שהשלב הזה עבר בהצלחה
+    console.log("בדיקה: אירוע DOMContentLoaded הופעל. הדף מוכן.");
 
-    // איתור כל האלמנטים שאנו צריכים פעם אחת בלבד
-    const loginView = document.getElementById('loginView');
-    const registerView = document.getElementById('registerView');
-    const showRegisterLink = document.getElementById('showRegister');
-    const showLoginLink = document.getElementById('showLogin');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const messageElement = document.getElementById('message');
-
-    // מאזין למעבר ממסך כניסה למסך הרשמה
-    showRegisterLink.addEventListener('click', (event) => {
-        event.preventDefault(); // מונע מהדף לקפוץ
-        loginView.classList.add('hidden');
-        registerView.classList.remove('hidden');
-        messageElement.textContent = ''; // מנקה הודעות קודמות
-    });
-
-    // מאזין למעבר ממסך הרשמה בחזרה למסך כניסה
-    showLoginLink.addEventListener('click', (event) => {
-        event.preventDefault();
-        registerView.classList.add('hidden');
-        loginView.classList.remove('hidden');
-        messageElement.textContent = '';
-    });
-
-    // מאזין לשליחת טופס ההרשמה
-    registerForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
-        handleApiRequest('/api/register', { email, password }, 'יוצר שחקן חדש, אנא המתן...');
-    });
-
-    // מאזין לשליחת טופס הכניסה
-    loginForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        handleApiRequest('/api/login', { email, password }, 'מאמת פרטים מול השרת...');
-    });
-
-    // פונקציית עזר מרכזית, המטפלת בכל התקשורת עם השרת
-    async function handleApiRequest(endpoint, bodyData, loadingMessage) {
+    // נאתר את שני הכפתורים החשובים
+    const loginButton = document.querySelector('#loginForm button');
+    const registerButton = document.getElementById('showRegister');
+    
+    // --- בדיקה עבור כפתור הכניסה ---
+    if (loginButton) {
+        console.log("בדיקה: כפתור 'היכנס ליער' נמצא בהצלחה!");
         
-        messageElement.textContent = loadingMessage;
-        messageElement.style.color = 'inherit'; // איפוס צבע ההודעה
+        loginButton.addEventListener('click', (event) => {
+            event.preventDefault(); // מונעים מהטופס להישלח
+            console.log("!!! הצלחה: כפתור הכניסה נלחץ והגיב !!!");
+            alert('הצלחה! כפתור הכניסה עובד!');
+        });
+    } else {
+        console.error("!!! שגיאה: כפתור 'היכנס ליער' לא נמצא בדף !!!");
+    }
 
-        try {
-            // שליחת הבקשה לשרת
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bodyData)
-            });
-
-            // קבלת התשובה מהשרת
-            const result = await response.json();
-
-            // בדיקה אם השרת החזיר שגיאה (לדוגמה: 401, 409, 500)
-            if (!response.ok) {
-                throw new Error(result.error || 'אירעה שגיאה לא צפויה');
-            }
-
-            // אם הפעולה הצליחה, נציג הודעה ירוקה
-            messageElement.style.color = 'green';
-            messageElement.textContent = result.message;
-            
-            // אם זו הייתה כניסה מוצלחת, נשמור את הפרטים ונעבור לדף המשחק
-            if (endpoint === '/api/login' && result.player_id) {
-                // שומרים את מזהה השחקן בזיכרון המקומי של הדפדפן
-                localStorage.setItem('player_id', result.player_id);
-                
-                setTimeout(() => {
-                    // מעבר לדף המשחק
-                    window.location.href = '/game.html';
-                }, 1000); // נותנים למשתמש שנייה לקרוא את הודעת ההצלחה
-            }
-
-        } catch (error) {
-            // במקרה של שגיאה, נציג אותה באדום
-            messageElement.style.color = 'red';
-            messageElement.textContent = `שגיאה: ${error.message}`;
-        }
+    // --- בדיקה עבור קישור ההרשמה ---
+    if (registerButton) {
+        console.log("בדיקה: הקישור 'הירשם כאן' נמצא בהצלחה!");
+        
+        registerButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            console.log("!!! הצלחה: קישור ההרשמה נלחץ והגיב !!!");
+            alert('הצלחה! הקישור להרשמה עובד!');
+        });
+    } else {
+        console.error("!!! שגיאה: הקישור 'הירשם כאן' לא נמצא בדף !!!");
     }
 });
-```בעזרת השם יתברך, עכשיו, כשגם השרת וגם קוד הממשק מיושרים ותקינים, המערכת תעבוד. ישר כוח על הסבלנות.
