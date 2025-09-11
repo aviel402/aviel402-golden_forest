@@ -41,7 +41,7 @@ def register():
         players = read_players_from_file()
 
         if username in players:
-            return jsonify(error='שם המשתמש הזה כבר תפוס'), 409
+            return jsonify(error='שם המשתמש הזה כבר תפוס, נסה שם אחר'), 409
         
         players[username] = { 'password_hash': generate_password_hash(password) }
         

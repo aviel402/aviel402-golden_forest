@@ -52,7 +52,7 @@ button {
     /* הכפתור הכחול */
     background-color: #0066ff;
     border: 2px solid #ffffff;
-    color: white;
+    color: rgb(188, 44, 44);
 
     border-radius: 8px;
     font-size: 18px;
@@ -67,7 +67,7 @@ button:hover {
 
 /* הקישור הקטן מתחת לכפתור */
 .toggle-link {
-    color: #ffffff; /* שיניתי ללבן כדי שיהיה קריא על רקע אדום */
+    color: #00ffea; /* שיניתי ללבן כדי שיהיה קריא על רקע אדום */
     cursor: pointer;
     margin-top: 15px;
     display: block;
