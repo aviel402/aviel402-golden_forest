@@ -1,36 +1,39 @@
-/* קובץ: public/style.css - מבוסס על העיצוב החדש שלך */
+/* קובץ: public/style.css - עיצוב 'שחור-זהב' */
 
 body {
-    /* הרקע הירוק הזוהר שבחרת */
-    background-color: #00ff00; /* Lime Green */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     
-    font-family: sans-serif;
+    /* === כאן התיקון הקריטי למילוי התמונה === */
+    background-image: url('/assets/images/background.jpg');
+    background-size: cover;          /* יגרום לתמונה לכסות את כל השטח */
+    background-position: center;     /* ימרכז את התמונה */
+    background-repeat: no-repeat;    /* ימנע מהתמונה לחזור על עצמה */
+    background-attachment: fixed;    /* ישאיר את הרקע קבוע בגלילה */
+
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
 }
 
-.container {
-    /* הקופסה האדומה המרכזית */
-    background-color: #c00000; /* A strong red */
+.container, .game-container {
+    background-color: rgba(0, 0, 0, 0.75); /* קופסה שחורה עם שקיפות */
+    border: 2px solid #FFD700; /* מסגרת זהב */
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5); /* זוהר זהוב מסביב */
+    backdrop-filter: blur(4px); /* טשטוש עדין של הרקע מאחורי הקופסה */
     
-    /* המסגרת הטורקיזית הזוהרת מסביב */
-    border: 3px solid #00ffff;
-    box-shadow: 0 0 20px #00ffff;
-
     padding: 30px 40px;
-    border-radius: 10px;
+    border-radius: 12px;
     text-align: center;
-    width: 350px;
+    width: 360px;
+    color: #FFFFFF; /* טקסט לבן */
 }
 
 h1 {
-    /* הכותרות בירוק זוהר */
     font-size: 28px;
-    color: #39ff14; /* Neon Green */
-    text-shadow: 0 0 5px #39ff14; /* מוסיף אפקט זוהר קטן */
+    color: #FFD700; /* כותרות בצבע זהב */
+    text-shadow: 0 0 8px #FFD700; /* אפקט זוהר */
     margin-bottom: 25px;
 }
 
@@ -38,36 +41,44 @@ input {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
-    border: 2px solid #dddfe2;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid #FFD700;
     border-radius: 6px;
-    box-sizing: border-box;
+    color: #FFFFFF;
     text-align: right;
     font-size: 16px;
+}
+
+input::placeholder { /* עיצוב הטקסט המוצע בתוך התיבה */
+    color: #cccccc;
 }
 
 button {
     width: 100%;
     padding: 12px;
-    
-    /* הכפתור הכחול */
-    background-color: #0066ff;
-    border: 2px solid #ffffff;
-    color: rgb(188, 44, 44);
-
+    background-color: #FFD700; /* כפתור בצבע זהב */
+    border: none;
+    color: #000000; /* טקסט שחור, לניגודיות */
     border-radius: 8px;
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s; /* אפקט קטן למעבר עכבר */
+    transition: all 0.2s ease-in-out;
 }
 
 button:hover {
-    background-color: #004ecc; /* כחול כהה יותר במעבר עכבר */
+    background-color: #ffed4a; /* זהב בהיר יותר במעבר עכבר */
+    box-shadow: 0 0 15px #ffed4a;
 }
 
-/* הקישור הקטן מתחת לכפתור */
+button.secondary {
+    background-color: transparent;
+    border: 2px solid #FFD700;
+    color: #FFD700;
+}
+
 .toggle-link {
-    color: #00ffea; /* שיניתי ללבן כדי שיהיה קריא על רקע אדום */
+    color: #ffed4a;
     cursor: pointer;
     margin-top: 15px;
     display: block;
@@ -80,9 +91,7 @@ p#message {
     font-weight: bold;
     font-size: 16px;
     min-height: 20px;
-    color: white; /* גם ההודעות יהיו בלבן */
+    color: #FFFFFF;
 }
 
-.hidden {
-    display: none;
-}
+.hidden { display: none; }
