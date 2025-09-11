@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>יער הזהב</title><link rel="stylesheet" href="/style.css"></head>
 <body>
-    <div class="container">
-        <div id="loginView"><h1>כניסה למשחק</h1><form id="loginForm"><input type="text" id="loginUsername" placeholder="שם משתמש" required><input type="password" id="loginPassword" placeholder="סיסמה" required><button type="submit">היכנס ליער</button></form><a href="#" class="toggle-link" id="showRegister">אין לך שחקן? הירשם כאן</a></div>
-        <div id="registerView" class="hidden"><h1>יצירת שחקן חדש</h1><form id="registerForm"><input type="text" id="registerUsername" placeholder="שם משתמש" required><input type="password" id="registerPassword" placeholder="סיסמה" required><button type="submit" class="secondary">צור שחקן</button></form><a href="#" class="toggle-link" id="showLogin">כבר רשום? היכנס כאן</a></div>
-        <p id="message"></p>
+    <div id="app-container">
+
+        <!-- אזור הכניסה וההרשמה -->
+        <div id="auth-view">
+            <div class="container">
+                <div id="loginView"><h1>כניסה למשחק</h1><form id="loginForm"><input type="text" id="loginUsername" placeholder="שם משתמש" required><input type="password" id="loginPassword" placeholder="סיסמה" required><button type="submit">היכנס ליער</button></form><a href="#" class="toggle-link" id="showRegister">אין לך שחקן? הירשם כאן</a></div>
+                <div id="registerView" class="hidden"><h1>יצירת שחקן חדש</h1><form id="registerForm"><input type="text" id="registerUsername" placeholder="שם משתמש" required><input type="password" id="registerPassword" placeholder="סיסמה" required><button type="submit" class="secondary">צור שחקן</button></form><a href="#" class="toggle-link" id="showLogin">כבר רשום? היכנס כאן</a></div>
+                <p id="auth-message"></p>
+            </div>
+        </div>
+
+        <!-- אזור המשחק (ה"עיירה") - מוסתר בהתחלה -->
+        <div id="game-view" class="hidden">
+            <div class="game-container"><header class="status-bar"><h2>שלום, <span id="player-username"></span>!</h2><div id="character-stats"><p class="status-item">רמה: <span id="player-level"></span></p><p class="status-item">ניסיון: <span id="player-xp"></span></p><p class="status-item">זהב: <span id="player-gold"></span></p></div></header><main class="actions-menu"><h1>העיירה</h1><p>מה תרצה לעשות?</p><button>צא להרפתקה (בפיתוח)</button><button id="logoutBtn">התנתק</button></main></div>
+        </div>
+
     </div>
     <script src="/script.js"></script>
 </body>
