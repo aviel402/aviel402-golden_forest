@@ -1,37 +1,6 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>יער הזהב</title><link rel="stylesheet" href="/style.css"></head>
-<body>
-    <div id="main-container">
-
-        <!-- ===== אזור העיירה (כמו קודם) ===== -->
-        <div id="town-view">
-            <div class="game-container"><header class="status-bar"><h2>שלום, <span id="player-username-town"></span>!</h2><div id="character-stats"><p class="status-item">רמה: <span id="level"></span></p><p class="status-item">ניסיון: <span id="xp"></span></p><p class="status-item">זהב: <span id="gold"></span></p></div></header><main class="actions-menu"><h1>העיירה</h1><p>מה תרצה לעשות?</p><button id="adventureBtn">צא להרפתקה</button><button id="logoutBtn">התנתק</button></main></div>
-        </div>
-
-        <!-- ===== אזור הקרב (חדש ומוסתר) ===== -->
-        <div id="combat-view" class="hidden">
-            <div class="combat-container">
-                <div class="combatant" id="player-combat-stats">
-                    <h3>אתה</h3>
-                    <p>חיים: <span id="player-health">100</span></p>
-                </div>
-
-                <div class="combat-message-area">
-                    <p id="combat-message">אתה מתכונן לקרב...</p>
-                </div>
-
-                <div class="combatant" id="monster-combat-stats">
-                    <h3 id="monster-name">שם החיה</h3>
-                    <p>חיים: <span id="monster-health">50</span></p>
-                </div>
-            </div>
-            <div class="combat-actions">
-                <button id="attackBtn">התקף!</button>
-                <button>הגן (בפיתוח)</button>
-                <button>ברח (בפיתוח)</button>
-            </div>
-        </div>
-    </div>
-    <script src="/game-script.js"></script>
+<body><div id="main-container"><div id="town-view"><div class="game-container"><header class="status-bar"><h2>שלום, <span id="player-username-town"></span>!</h2><div id="character-stats"><p>רמה: <span id="level"></span> | ניסיון: <span id="xp"></span> | זהב: <span id="gold"></span> | חיים: <span id="health-town"></span></p></div></header><main class="actions-menu"><h1>העיירה</h1><p>מה תרצה לעשות?</p><button id="adventureBtn">צא להרפתקה</button><button id="logoutBtn">התנתק</button></main></div></div><div id="combat-view" class="hidden"><div class="combat-container"><div class="combatant"><h3><span id="player-username-combat"></span></h3><p>חיים: <span id="player-health"></span></p></div><div class="combat-message-area"><p id="combat-message">...</p></div><div class="combatant"><h3 id="monster-name"></h3><p>חיים: <span id="monster-health"></span></p></div></div><div class="combat-actions"><button id="attackBtn">התקף</button></div></div></div>
+<script src="/game-script.js"></script>
 </body>
 </html>
